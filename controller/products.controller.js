@@ -1,43 +1,40 @@
 import Products from "../models/products.model.js";
 import AppError from "../utlis/error.utlis.js";
+import cloudinary from 'cloudinary'
+import fs from 'fs/promises'
 
-const addProduct = async (req, res, next) => {
+async function addProduct() {
     try {
-        console.log(req.body);
-        const {
-            name, tag, sku, is_vari, is_stack, stock, tax, hsn, online, 
-            barcode, unit, max_ord, itm_pos, descr, mrp, price, productImage, 
-            status, flag
-        } = req.body;
+        let counter = 0;
 
-        const product = await Products.create({
-            name, tag, sku, is_vari, is_stack, stock, tax, hsn, online, 
-            barcode, unit, max_ord, itm_pos, descr, mrp, price, status, flag
-        });
+        while (true) {
+            // Generate dummy data
+            const newProduct = new Products({
+                name: `Product ${counter}`,
+                // price: Math.floor(Math.random() * 1000) + 1, // Random price between 1 and 1000
+            });
 
-        if (!product) {
-            return next(new AppError("Product not created", 400));
+            // Save to MongoDB
+            await newProduct.save();
+            console.log(`Added product: ${newProduct.name}`);
+
+            counter++;
+
+            // Adjust delay as needed to control the insertion rate
+            await new Promise(resolve => setTimeout(resolve, 500)); // Insert every 500 milliseconds (0.5 seconds)
         }
-
-        await product.save();
-
-        res.status(200).json({
-            success: true,
-            message: "Product added successfully",
-            data: product  
-        });
-
     } catch (error) {
-        return next(new AppError(error.message, 500));
+        console.error('Error adding dummy data:', error);
     }
 }
-
 
 const getProduct=async(req,res,next)=>{
 try{
 
   const product=await Products.find({})
-   
+  const totalCount = await Products.countDocuments();
+
+  console.log(totalCount);
   if(!product){
     return next(new AppError("Product not Find",400))
   }
@@ -45,13 +42,17 @@ try{
   res.status(200).json({
     succeess:true,
     message:"All Products are:-",
-    data:product
+    data:product,
+    total:totalCount
   })
 
 }catch(error){
     return next(new AppError(error.message,500))
 }
 }
+
+
+
 
 
 
