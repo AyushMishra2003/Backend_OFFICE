@@ -52,3 +52,40 @@ async function connectDb() {
 }
 
 connectDb();
+
+
+
+/*
+
+
+async function addDummyData() {
+    try {
+        let counter = 0;
+        const batchSize = 1000; // Larger batch size for better performance
+
+        while (true) {
+            const products = [];
+
+            for (let i = 0; i < batchSize; i++) {
+                const newProduct = {
+                    name: `Product ${counter}`,
+                    price: Math.floor(Math.random() * 1000) + 1,
+                };
+                products.push(newProduct);
+                counter++;
+            }
+
+            // Insert batch of products into MongoDB
+            await Product.insertMany(products);
+            console.log(`Added ${batchSize} products`);
+
+            // Adjust delay as needed to control the insertion rate
+            await new Promise(resolve => setTimeout(resolve, 500)); // Insert every 500 milliseconds
+        }
+    } catch (error) {
+        console.error('Error adding dummy data:', error);
+    }
+}
+
+addDummyData();
+*/
