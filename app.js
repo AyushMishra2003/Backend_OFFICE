@@ -4,6 +4,7 @@ import { config } from 'dotenv';
 import morgan from 'morgan';
 import errorMiddleware from './middleware/error.middleware.js';
 import productRouter from './routes/product.routes.js';
+import customer from './routes/customer.routes.js';
 
 
 config();
@@ -31,6 +32,7 @@ app.use((req, res, next) => {
 
 
 app.use('/api/v1/product',productRouter)
+app.use('/api/v1/customer',customer)
 
 // Default route for testing
 app.get('/', (req, res) => {
