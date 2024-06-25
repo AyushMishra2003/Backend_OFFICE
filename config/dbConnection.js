@@ -1,20 +1,22 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
-mongoose.set('strictQuery',false)
+async function connectDb() {
+    try {
+        const dbUrl = process.env.MONGODB_URL || 'mongodb://localhost:27017/your_database';
 
-const ConnectionToDB=async()=>{
-    try{
-    const {connection}=await mongoose.connect(
-        process.env.MONGODB_URL
-    )
+        await mongoose.connect(dbUrl, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
 
-    if(connection){
-        console.log("Connected to Mongoo DB");
+        console.log('Connected to MongoDB');
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error);
+        process.exit(1); // Exit process on connection failure
     }
-   } catch(e){
-    console.log(e);
-    process.exit(1)
-   }
 }
 
-export default ConnectionToDB
+export default connectDb;
+
+// Usage example:
+// Import this function in your main application file and call it to establish the MongoDB connection.

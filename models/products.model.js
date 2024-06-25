@@ -1,11 +1,9 @@
 import {model,Schema} from "mongoose";
 
-
 const produtsSchema=new Schema(
     {
          name:{
-            type:String,
-            // required:true
+            type:String
          },
          tag:{
             type:String,
@@ -81,16 +79,14 @@ const produtsSchema=new Schema(
                 default: '0'
             }
         }],
-         productImage:[
-            {
-                public_url:{
+         productImage:{
+                public_id:{
                     type:String
                 },
                 secure_url:{
                     type:String
                 }
-            }
-         ],
+            },
          status:{
             type:Number,
             default:1
