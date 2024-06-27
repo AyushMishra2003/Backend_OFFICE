@@ -2,6 +2,7 @@ import xlsx from 'xlsx';
 import Customer from '../models/customer.model.js';
 import { Parser } from 'json2csv';
 import { createReadStream } from 'fs';
+import { log } from 'console';
 
 const addCustomersFromExcel = async (req, res, next) => {
   try {
@@ -15,25 +16,45 @@ const addCustomersFromExcel = async (req, res, next) => {
     const excelData = xlsx.utils.sheet_to_json(sheet);
 
     const userData = excelData.map(row => ({
-      name: row.Name,
-      email: row.Email,
-      mobile: row.Mobile
+      member: row.member,
+      mobile: row.mobile,
+      gender: row.gender,
+      email: row.email,
+      password: row.password
     }));
 
-    console.log(userData);
+    // Insert customers into MongoDB
+    const result = await Customer.insertMany(userData, { ordered: false });
 
-    await Customer.insertMany(userData);
+    // Check for duplicate key errors in the result
+    const duplicateErrors = result.filter(entry => entry instanceof Error && entry.code === 11000);
+
+    if (duplicateErrors.length > 0) {
+      // Extract duplicated fields
+      const duplicates = duplicateErrors.map(error => ({
+        key: Object.keys(error.keyValue)[0],
+        value: error.keyValue[Object.keys(error.keyValue)[0]]
+      }));
+
+      return res.status(400).json({
+        success: false,
+        message: 'Duplicate key error',
+        duplicates: duplicates
+      });
+    }
 
     res.status(200).json({
-      success:true,
-      message:"data added",
-      data:userData
-    })
+      success: true,
+      message: 'Data added successfully',
+      data: result
+    });
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ success: false, message: 'Error adding data', error: error.message });
   }
-}
+};
+
+
 
 const getCustomer = async (req, res, next) => {
   try {

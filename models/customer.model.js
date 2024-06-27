@@ -1,13 +1,17 @@
 import { model, Schema } from 'mongoose';
 
 const customerSchema = new Schema({
+    member: { type: String, required: true },
+    mobile: { type: String, required: true },
+    gender: { type: String, required: true },
+    email: { type: String, required: true },
+    password: { type: String, required: true }
 
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    mobile: { type: String }
-}, {
+  },
+   {
     timestamps: true
-});
+}
+);
 
 const Customer = model('CUSTOMER', customerSchema);
 
