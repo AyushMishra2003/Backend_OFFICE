@@ -57,8 +57,8 @@ const addCustomersFromExcel = async (req, res, next) => {
 
 
 const getCustomer = async (req, res, next) => {
-  const page = req.query.page || 1; // Default to page 1 if not provided
-  const limit = 100; // Adjust the limit as needed
+  const page = req.query.page || 1; 
+  const limit = 100; 
 
   try {
     // Fetch customers for the current page
