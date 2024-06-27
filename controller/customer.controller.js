@@ -57,33 +57,41 @@ const addCustomersFromExcel = async (req, res, next) => {
 
 
 const getCustomer = async (req, res, next) => {
+  const page = req.query.page || 1; // Default to page 1 if not provided
+  const limit = 100; // Adjust the limit as needed
+
   try {
-    const customers = await Customer.find({}).lean();
+    // Fetch customers for the current page
+    const customers = await Customer.find({})
+      .skip((page - 1) * limit)
+      .limit(limit)
+      .lean();
 
     if (customers.length === 0) {
       return res.status(404).json({ success: false, message: 'No customers found' });
     }
 
-    // Prepare Excel workbook
+    // Prepare Excel workbook for the current page
     const wb = xlsx.utils.book_new();
     const ws = xlsx.utils.json_to_sheet(customers);
-    xlsx.utils.book_append_sheet(wb, ws, 'Customers');
+    xlsx.utils.book_append_sheet(wb, ws, `Customers Page ${page}`);
 
-    // Generate Excel file
-    const excelFilePath = './customers.xlsx'; // Adjust the path as needed
-    xlsx.writeFile(wb, excelFilePath);
+    // Generate Excel file in a buffer
+    const excelBuffer = xlsx.write(wb, { type: 'buffer', bookType: 'xlsx' });
 
     // Send the file as a response
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=customers.xlsx');
-    
-    createReadStream(excelFilePath).pipe(res);
+    res.setHeader('Content-Disposition', `attachment; filename=customers_page_${page}.xlsx`);
+
+    // Pipe workbook buffer directly to response stream
+    res.write(excelBuffer);
+    res.end();
 
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ success: false, message: 'Error downloading customers as Excel', error: error.message });
   }
-}
+};
 
 
 export { addCustomersFromExcel, getCustomer };
