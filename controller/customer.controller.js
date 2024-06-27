@@ -56,7 +56,7 @@ const addCustomersFromExcel = async (req, res, next) => {
 
 
 
-const getCustomer = async (req, res, next) => {
+const getCustomers = async (req, res, next) => {
   const page = req.query.page || 1; 
   const limit = 100; 
 
@@ -94,4 +94,4 @@ const getCustomer = async (req, res, next) => {
 };
 
 
-export { addCustomersFromExcel, getCustomer };
+export { addCustomersFromExcel, getCustomers };
