@@ -1,66 +1,68 @@
-import AppError from "../utlis/error.utlis.js"
-import Customer from "../models/customer.model.js"
+import xlsx from 'xlsx';
+import Customer from '../models/customer.model.js';
+import { Parser } from 'json2csv';
+import { createReadStream } from 'fs';
 
+const addCustomersFromExcel = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
 
-const addCustomer=async(req,res,next)=>{
-try{
-   const {name,email,mobile,gender,dob,card_id,orderCount,status,flag_wm}=req.body
-    
-   console.log(req.body);
+    const workbook = xlsx.readFile(req.file.path);
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const excelData = xlsx.utils.sheet_to_json(sheet);
 
-   if(!name || !email){
-    return next(new AppError("All Filed are Required",400))
-   }
+    const userData = excelData.map(row => ({
+      name: row.Name,
+      email: row.Email,
+      mobile: row.Mobile
+    }));
 
-   const customer=await Customer.create({
-      name,
-      email,
-      gender,
-      dob,
-      card_id,
-      orderCount,
-      status,
-      flag_wm,
-      mobile
-   })
+    console.log(userData);
 
-   if(!customer){
-    return next(new AppError("Customer not Created,please try again",400))
-   }
+    await Customer.insertMany(userData);
 
-   res.status(200).json({
-     success:true,
-     message:"adding customer are:-",
-     data:customer
-   })
-}catch(error){
-    return next(new AppError(error.message,500))
-}
-}
-
-
-const getCustomer=async(req,res,next)=>{
-try{
-
-  const customer=await Customer.find({})
-
-  if(!customer){
-    return next(new AppError("Customer Not Found",400))
+    res.status(200).json({
+      success:true,
+      message:"data added",
+      data:userData
+    })
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ success: false, message: 'Error adding data', error: error.message });
   }
-
-  res.status(200).json({
-     success:true,
-     message:"All Customer Are:-",
-     data:customer
-  })
-
-}catch(error){
-  return next(new AppError(error.message,500))
-}
 }
 
+const getCustomer = async (req, res, next) => {
+  try {
+    const customers = await Customer.find({}).lean();
 
-export {
-    addCustomer,
-    getCustomer
+    if (customers.length === 0) {
+      return res.status(404).json({ success: false, message: 'No customers found' });
+    }
+
+    // Prepare Excel workbook
+    const wb = xlsx.utils.book_new();
+    const ws = xlsx.utils.json_to_sheet(customers);
+    xlsx.utils.book_append_sheet(wb, ws, 'Customers');
+
+    // Generate Excel file
+    const excelFilePath = './customers.xlsx'; // Adjust the path as needed
+    xlsx.writeFile(wb, excelFilePath);
+
+    // Send the file as a response
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=customers.xlsx');
+    
+    createReadStream(excelFilePath).pipe(res);
+
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ success: false, message: 'Error downloading customers as Excel', error: error.message });
+  }
 }
+
+
+export { addCustomersFromExcel, getCustomer };

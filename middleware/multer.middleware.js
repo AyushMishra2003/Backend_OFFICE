@@ -1,30 +1,24 @@
-import multer from 'multer'
-import path from 'path'
+import multer from 'multer';
+import path from 'path';
+
+const storage = multer.diskStorage({
+  destination: function (_req, _file, cb) {
+    cb(null, 'uploads/'); // Destination folder where uploaded files will be stored
+  },
+  filename: function (_req, file, cb) {
+    cb(null, file.originalname); // Keep original file name
+  }
+});
 
 const upload = multer({
-    dest: 'uploads/',
-    limits: { fileSize: 50 * 1024 * 1024 },
-    storage: multer.diskStorage({
-        destination: 'uploads/',
-        filename: (_req, file, cb) => {
-            cb(null, file.originalname)
-        }
-    }),
-    fileFilter: (_req, file, cb) => {
-        let ext = path.extname(file.originalname)
-
-        if (
-            ext !== ".jpg" &&
-            ext !== ".jpeg" &&
-            ext !== ".webp" &&
-            ext !== ".mp4" &&
-            ext !== ".png"
-        ) {
-            cb(new Error(`Unsupported file type! ${ext}`), false)
-            return
-        }
-        cb(null, true)
+  storage: storage,
+  fileFilter: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (ext !== '.xlsx' && ext !== '.xls') {
+      return cb(new Error('Only Excel files are allowed'));
     }
-})
+    cb(null, true);
+  }
+});
 
-export default upload
+export default upload;

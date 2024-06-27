@@ -1,13 +1,10 @@
-import { Router } from "express";
-import { addCustomer, getCustomer } from "../controller/customer.controller.js";
+import { Router } from 'express';
+import { addCustomersFromExcel, getCustomer } from '../controller/customer.controller.js';
+import upload from '../middleware/multer.middleware.js';
 
+const router = Router();
 
-const customer=Router()
+router.post('/', upload.single('file'), addCustomersFromExcel);
+router.get('/', getCustomer);
 
-
-customer.post("/",addCustomer)
-customer.get("/",getCustomer)
-
-
-export default customer
-
+export default router;

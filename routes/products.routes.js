@@ -9,7 +9,7 @@ import upload from "../middleware/multer.middleware.js";
 const productsRouter=Router()
 
 
-productsRouter.post("/",addProduct)
+productsRouter.post("/", upload.single('file'), addProduct);
 
 productsRouter.get("/",getProduct)
 
