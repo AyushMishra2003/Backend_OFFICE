@@ -23,6 +23,8 @@ const addCustomersFromExcel = async (req, res, next) => {
       password: row.password
     }));
 
+    console.log(userData);
+
     // Insert customers into MongoDB
     const result = await Customer.insertMany(userData, { ordered: false });
 
