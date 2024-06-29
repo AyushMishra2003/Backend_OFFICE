@@ -1,6 +1,10 @@
+// multer.js
+
 import multer from 'multer';
 import path from 'path';
+import mime from 'mime-types';
 
+// Multer configuration for storing files
 const storage = multer.diskStorage({
   destination: function (_req, _file, cb) {
     cb(null, 'uploads/'); // Destination folder where uploaded files will be stored
@@ -10,15 +14,31 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({
-  storage: storage,
-  fileFilter: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (ext !== '.xlsx' && ext !== '.xls') {
-      return cb(new Error('Only Excel files are allowed'));
-    }
-    cb(null, true);
+// File filter for Multer to accept various file types
+const fileFilter = (_req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
+  const mimeType = mime.lookup(file.originalname); // Get MIME type
+
+  console.log('File:', file.originalname);
+  console.log('Extension:', ext);
+  console.log('MIME Type:', mimeType);
+
+  if (
+    ext !== '.xlsx' && ext !== '.xls' && // Excel files
+    ext !== '.jpeg' && ext !== '.jpg' && ext !== '.png' && // Image files
+    ext !== '.pdf' && // PDF files
+    (ext !== '.doc' && ext !== '.docx') && // Word files
+    mimeType !== 'application/pdf' &&
+    mimeType !== 'application/msword' &&
+    mimeType !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' &&
+    mimeType !== 'application/zip' // Allow ZIP files
+  ) {
+    return cb(new Error('Only Excel, JPEG, JPG, PNG, PDF, DOC, DOCX, and ZIP files are allowed'));
   }
-});
+  cb(null, true);
+};
+
+// Initialize Multer instance with storage and fileFilter
+const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 export default upload;

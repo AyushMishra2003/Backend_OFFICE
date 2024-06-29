@@ -2,10 +2,15 @@ import xlsx from 'xlsx';
 import Customer from '../models/customer.model.js';
 import { Parser } from 'json2csv';
 import { createReadStream } from 'fs';
-import { log } from 'console';
+import AppError from '../utlis/error.utlis.js';
+
 
 const addCustomersFromExcel = async (req, res, next) => {
   try {
+
+   
+
+
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
@@ -54,7 +59,7 @@ const addCustomersFromExcel = async (req, res, next) => {
     console.error('Error:', error);
     res.status(500).json({ success: false, message: 'Error adding data', error: error.message });
   }
-};
+}
 
 
 
@@ -93,7 +98,34 @@ const getCustomers = async (req, res, next) => {
     console.error('Error:', error);
     res.status(500).json({ success: false, message: 'Error downloading customers as Excel', error: error.message });
   }
-};
+}
 
 
-export { addCustomersFromExcel, getCustomers };
+const getAllCustomer=async(req,res,next)=>{
+  const page = req.query.page || 1; 
+  const limit = 100; 
+
+try{
+
+  const customers = await Customer.find({})
+  .skip((page - 1) * limit)
+  .limit(limit)
+  .lean();
+
+if (customers.length === 0) {
+  return next(new AppError("Customer Not Found",400))
+}
+
+res.status(200).json({
+  success:true,
+  message:"All Customers are:-",
+  data:customers
+})
+
+}catch(error){
+  return next(new AppError(error.message,500))
+}
+}
+
+
+export { addCustomersFromExcel, getCustomers,getAllCustomer }
