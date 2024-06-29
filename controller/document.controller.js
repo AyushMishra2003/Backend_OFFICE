@@ -57,9 +57,32 @@ const uploadCVAndPhoto = async (req, res, next) => {
       console.error('Error:', error);
       res.status(500).json({ success: false, message: 'Error creating document with CV and photo', error: error.message });
     }
-  }
+}
+
+
+const getAllDocument=async(req,res,next)=>{
+    try{
+       
+        const document=await Document.find({})
+
+        if(!document){
+            return next(new AppError("Document Not Find",400))
+        }
+
+        res.status(200).json({
+            success:true,
+            message:"All Document Are:-",
+            data:document
+        })
+
+
+    }catch(error){
+        return next(new AppError(error.message,500))
+    }
+}
 
 
 export {
-   uploadCVAndPhoto
+   uploadCVAndPhoto,
+   getAllDocument
 }
