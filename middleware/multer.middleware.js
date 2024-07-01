@@ -1,4 +1,3 @@
-// multer.js
 
 import multer from 'multer';
 import path from 'path';
@@ -24,14 +23,15 @@ const fileFilter = (_req, file, cb) => {
   console.log('MIME Type:', mimeType);
 
   if (
-    ext !== '.xlsx' && ext !== '.xls' && // Excel files
-    ext !== '.jpeg' && ext !== '.jpg' && ext !== '.png' && // Image files
-    ext !== '.pdf' && // PDF files
-    (ext !== '.doc' && ext !== '.docx') && // Word files
+    ext !== '.xlsx' && ext !== '.xls' && 
+    ext !== '.jpeg' && ext !== '.jpg' && ext !== '.png' && 
+    ext !== '.pdf' &&
+    ext!=='.txt' &&
+    (ext !== '.doc' && ext !== '.docx') && 
     mimeType !== 'application/pdf' &&
     mimeType !== 'application/msword' &&
     mimeType !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' &&
-    mimeType !== 'application/zip' // Allow ZIP files
+    mimeType !== 'application/zip' 
   ) {
     return cb(new Error('Only Excel, JPEG, JPG, PNG, PDF, DOC, DOCX, and ZIP files are allowed'));
   }

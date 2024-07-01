@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import errorMiddleware from './middleware/error.middleware.js';
 import productsRouter from './routes/products.routes.js';
 import customerRouter from './routes/customer.routes.js'; // Corrected variable name to customerRouter
+import loggingMiddleware from './middleware/log.middleware.js';
 
 config(); // Load environment variables from .env file
 
@@ -25,6 +26,10 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Credentials', 'true'); // Allow credentials like cookies
   next();
 });
+
+
+
+app.use(loggingMiddleware)
 
 // Routes
 app.use('/api/v1/product', productsRouter); // Endpoint for products

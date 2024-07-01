@@ -7,10 +7,6 @@ import AppError from '../utlis/error.utlis.js';
 
 const addCustomersFromExcel = async (req, res, next) => {
   try {
-
-   
-
-
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }

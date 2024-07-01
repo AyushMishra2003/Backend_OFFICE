@@ -11,66 +11,23 @@ import xlsx from 'xlsx'
 import fs from 'fs'
 
 const addProduct = async (req, res, next) => {
-  // try {
-  //   const expectedHeaders = ['S.No', 'Name', 'Email', 'Mobile'];
-  //   let actualHeaders = [];
+  try{
+      
+      const {price}=req.body
+     
+      const products=await Products.create({
+        price
+      })
+     
+      res.status(200).json({
+        success:true,
+        message:"Product Added",
+        data:products
+      })
 
-  //   // Using csv-parser library to parse CSV file
-  //   csv()
-  //     .fromFile(req.file.path)
-  //     .subscribe((csvRow) => {
-  //       // Assuming the first row contains headers
-  //       if (actualHeaders.length === 0) {
-  //         actualHeaders = Object.keys(csvRow);
-          
-  //         // Validate headers
-  //         const areHeadersValid = expectedHeaders.every(header => actualHeaders.includes(header));
-  //         if (!areHeadersValid) {
-  //            return next(new AppError("Not Found",400))
-  //         }
-  //       } else {
-  //         // Map data fields based on headers
-  //         const userData = {
-  //           name: csvRow['Name'],
-  //           email: csvRow['Email'],
-  //           contact: csvRow['Mobile']
-  //         };
-
-  //         // Save userData to MongoDB or process as needed
-  //         // Example: Save to MongoDB using Mongoose
-  //         const customer = new Customer(userData);
-  //         customer.save();
-  //       }
-  //     }, (error) => {
-  //       console.error('Error parsing CSV:', error);
-  //       return next(new AppError('Error parsing CSV', 500));
-  //     }, () => {
-  //       // Once all data is processed, send success response
-  //       res.status(200).json({
-  //         success: true,
-  //         message: "Data added successfully"
-  //       });
-  //     });
-
-  // } catch (error) {
-  //   // Handle any unexpected errors
-  //   console.error('Unexpected error:', error);
-  //   return next(new AppError(error.message, 500));
-  // }
-   csvtojson()
-         .fromFile("posts.csv")
-         .then(csvData=>{
-           Customer.insertMany(csvData).then(()=>{
-              res.status(200).json({
-                success:200,
-                message:"ajakmn"
-              }).catch((error)=>{
-                  res.status(400).json({
-                    message:"Not Added"
-                  })
-              })
-           })
-         })
+  }catch(error){
+    return next(new AppError(error.message,500))
+  }
 }
 
 
