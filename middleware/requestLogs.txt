@@ -14,3 +14,4 @@
 2024-07-01T07:17:00.055Z - POST /ap1/v1/product - Body: {"price":"5000"}
 2024-07-01T07:17:11.764Z - POST /api/v1/product - Body: {"price":"5000"}
 2024-07-01T07:19:26.750Z - POST /api/v1/product - Body: {"price":"8000"}
+2024-07-01T07:32:17.389Z - PUT /api/v1/product/667a9395bcdc3c561f47effc - Body: {"price":"78887099","name":"Product-1"}

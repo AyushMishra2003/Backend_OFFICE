@@ -64,10 +64,37 @@ const getProduct = async (req, res, next) => {
 }
 
 
+const updateProduct=async(req,res,next)=>{
+try{
+   
+   const {id}=req.params
+
+   console.log(id);
+
+   const product=Products.findById(id)
+
+   if(!product){
+      return next(new AppError("Product Not Found",400))
+   }
+
+
+   res.status(200).json({
+     success:true,
+     message:"Product Update Succesfully"
+   })
+
+
+}catch(error){
+  return next(new AppError(error.message,500))
+}
+}
+
+
 
 
 
 export {
     addProduct,
-    getProduct
+    getProduct,
+    updateProduct
 }

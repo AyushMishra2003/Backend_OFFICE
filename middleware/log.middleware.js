@@ -32,6 +32,27 @@ const loggingMiddleware = async (req, res, next) => {
             console.error('Error in logging middleware:', error);
         }
     }
+
+    if(req.method ==='PUT'){
+        try {
+            const logData = `${new Date().toISOString()} - ${req.method} ${req.url} - Body: ${JSON.stringify(req.body)}\n`;
+            console.log('Log data:', logData);
+
+            // Append log data to file
+            fs.appendFileSync(logFilePath, logData);
+
+            // Upload file to Cloudinary
+            const result = await cloudinary.uploader.upload(logFilePath, {
+                resource_type: 'raw', // Treat the file as raw data
+                public_id: 'request_logs', // Specify a public ID for Cloudinary
+                overwrite: true // Overwrite if file with the same public ID already exists
+            });
+            
+            console.log('File uploaded to Cloudinary:', result);
+        } catch (error) {
+            console.error('Error in logging middleware:', error);
+        }
+    }
     
     next();
 };
